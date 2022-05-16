@@ -4,5 +4,5 @@
 
 ## 架构总览
 
-![](.\image\Architecture.jpg "架构图")
+![](image/Architecture.jpg )
 
