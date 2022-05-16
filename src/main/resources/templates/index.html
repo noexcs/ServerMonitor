@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.3.2/dist/echarts.min.js"></script>
+    <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+    <title>Title</title>
+    <style>
+        div {
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+<div id="cpu" style="width: 600px;height:400px;"></div>
+<div id="memory" style="width: 600px;height:400px;"></div>
+<div id="disk" style="width: 600px;height:400px;"></div>
+</body>
+<script type="text/javascript">
+
+    var cpuChartDom = document.getElementById('cpu');
+    var myCpuChart = echarts.init(cpuChartDom, 'dark');
+    var optionCpu;
+
+    var memoryChartDom = document.getElementById('memory');
+    var myMemoryChart = echarts.init(memoryChartDom, 'dark');
+    var optionMemory;
+
+    var diskChartDom = document.getElementById('disk');
+    var myDiskChart = echarts.init(diskChartDom, 'dark');
+    var optionDisk;
+
+    function myAjax() {
+        let res = $.ajax({
+            //请求方式
+            type: "get",
+            //请求的地址
+            url: "status/queryStatus",
+            async: false,
+            dataType: "JSON",
+            //成功后的回调函数
+            success: function (returnData) {
+            },
+            //错误回调函数
+            error: function (x, t, e) {
+                alert("错误：" + e);
+            }
+        });
+        let returnData = res.responseJSON
+        let cpuData = [];
+        let memoryData = [];
+        let diskData = [];
+        if (returnData.code == 0) {
+            for (let status of returnData.data) {
+                let cpuUsage = {
+                    name: status.createTime,
+                    value: [
+                        status.createTime,
+                        status.cpuUsage
+                    ],
+                    ip: status.serverIp
+                };
+                let memoryUsage = {
+                    name: status.createTime,
+                    value: [
+                        status.createTime,
+                        status.memoryUsage
+                    ],
+                    ip: status.serverIp
+                };
+                let diskUsage = {
+                    name: status.createTime,
+                    value: [
+                        status.createTime,
+                        status.diskUsage
+                    ],
+                    ip: status.serverIp
+                };
+                cpuData.push(cpuUsage)
+                memoryData.push(memoryUsage)
+                diskData.push(diskUsage)
+            }
+            console.log(cpuData)
+
+        }
+        return {"cpuData": cpuData, "memoryData": memoryData, "diskData": diskData};
+    }
+
+    /*    var data = [];
+        data=myAjax();*/
+    optionCpu = {
+        title: {
+            text: 'cpu负载情况[' + myAjax().cpuData[0].ip + ']'
+        },
+        tooltip: {
+            trigger: 'axis',
+            formatter: function (params) {
+                params = params[0];
+                return (
+                    params.name +
+                    ' : ' +
+                    params.value[1]
+                );
+            },
+            axisPointer: {
+                animation: false
+            }
+        },
+        xAxis: {
+            type: 'time',
+            splitLine: {
+                show: false
+            }
+        },
+        yAxis: {
+            type: 'value',
+            boundaryGap: [0, '100%'],
+            splitLine: {
+                show: false
+            }
+        },
+        series: [
+            {
+                name: 'Fake Data',
+                type: 'line',
+                showSymbol: false,
+                data: myAjax().cpuData
+            }
+        ]
+    };
+    optionMemory = {
+        title: {
+            text: '内存使用情况%[' + myAjax().memoryData[0].ip + ']'
+        },
+        tooltip: {
+            trigger: 'axis',
+            formatter: function (params) {
+                params = params[0];
+                return (
+                    params.name +
+                    ' : ' +
+                    params.value[1] + '%'
+                );
+            },
+            axisPointer: {
+                animation: false
+            }
+        },
+        xAxis: {
+            type: 'time',
+            splitLine: {
+                show: false
+            }
+        },
+        yAxis: {
+            type: 'value',
+            boundaryGap: [0, '100%'],
+            splitLine: {
+                show: false
+            }
+        },
+        series: [
+            {
+                name: 'Fake Data',
+                type: 'line',
+                showSymbol: false,
+                data: myAjax().memoryData
+            }
+        ]
+    };
+    optionDisk = {
+        title: {
+            text: '磁盘使用情况%[' + myAjax().diskData[0].ip + ']'
+        },
+        tooltip: {
+            trigger: 'axis',
+            formatter: function (params) {
+                params = params[0];
+                return (
+                    params.name +
+                    ' : ' +
+                    params.value[1] + '%'
+                );
+            },
+            axisPointer: {
+                animation: false
+            }
+        },
+        xAxis: {
+            type: 'time',
+            splitLine: {
+                show: false
+            }
+        },
+        yAxis: {
+            type: 'value',
+            boundaryGap: [0, '100%'],
+            splitLine: {
+                show: false
+            }
+        },
+        series: [
+            {
+                name: 'Fake Data',
+                type: 'line',
+                showSymbol: false,
+                data: myAjax().diskData
+            }
+        ]
+    };
+    /*console.log(myAjax(),'<--')*/
+    setInterval(function () {
+        myCpuChart.setOption({
+            series: [
+                {
+                    data: myAjax().cpuData
+                }
+            ]
+        });
+        myMemoryChart.setOption({
+            series: [
+                {
+                    data: myAjax().memoryData
+                }
+            ]
+        });
+        myDiskChart.setOption({
+            series: [
+                {
+                    data: myAjax().diskData
+                }
+            ]
+        });
+    }, 10000);
+    // 使用刚指定的配置项和数据显示图表。
+    myCpuChart.setOption(optionCpu);
+    myMemoryChart.setOption(optionMemory);
+    myDiskChart.setOption(optionDisk);
+</script>
+</html>

@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.noexcs.dao.StatusDao">
+
+    <resultMap type="com.noexcs.entity.Status" id="StatusMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="cpuUsage" column="cpu_usage" jdbcType="NUMERIC"/>
+        <result property="memoryUsage" column="memory_usage" jdbcType="NUMERIC"/>
+        <result property="diskUsage" column="disk_usage" jdbcType="NUMERIC"/>
+        <result property="serverIp" column="server_ip" jdbcType="VARCHAR"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="StatusMap">
+        select
+          id, cpu_usage, memory_usage, disk_usage, server_ip, create_time
+        from tbl_status
+        where id = #{id}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="StatusMap">
+        select
+          id, cpu_usage, memory_usage, disk_usage, server_ip, create_time
+        from tbl_status
+        <where>
+            <if test="status.id != null">
+                and id = #{status.id}
+            </if>
+            <if test="status.cpuUsage != null">
+                and cpu_usage = #{status.cpuUsage}
+            </if>
+            <if test="status.memoryUsage != null">
+                and memory_usage = #{status.memoryUsage}
+            </if>
+            <if test="status.diskUsage != null">
+                and disk_usage = #{status.diskUsage}
+            </if>
+            <if test="status.serverIp != null and status.serverIp != ''">
+                and server_ip = #{status.serverIp}
+            </if>
+            <if test="status.createTime != null">
+                and create_time = #{status.createTime}
+            </if>
+        </where>
+        limit #{pageable.offset}, #{pageable.pageSize}
+    </select>
+
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Long">
+        select count(1)
+        from tbl_status
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="cpuUsage != null">
+                and cpu_usage = #{cpuUsage}
+            </if>
+            <if test="memoryUsage != null">
+                and memory_usage = #{memoryUsage}
+            </if>
+            <if test="diskUsage != null">
+                and disk_usage = #{diskUsage}
+            </if>
+            <if test="serverIp != null and serverIp != ''">
+                and server_ip = #{serverIp}
+            </if>
+            <if test="createTime != null">
+                and create_time = #{createTime}
+            </if>
+        </where>
+    </select>
+    <select id="queryStatus" resultMap="StatusMap">
+        select
+        id, cpu_usage, memory_usage, disk_usage, server_ip, create_time
+        from tbl_status
+        <where>
+            <if test="status.id != null">
+                and id = #{status.id}
+            </if>
+            <if test="status.cpuUsage != null">
+                and cpu_usage = #{status.cpuUsage}
+            </if>
+            <if test="status.memoryUsage != null">
+                and memory_usage = #{status.memoryUsage}
+            </if>
+            <if test="status.diskUsage != null">
+                and disk_usage = #{status.diskUsage}
+            </if>
+            <if test="status.serverIp != null and status.serverIp != ''">
+                and server_ip = #{status.serverIp}
+            </if>
+            <if test="status.createTime != null">
+                and create_time = #{status.createTime}
+            </if>
+        </where>
+        order by id desc
+            limit 0, 10
+
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into tbl_status(cpu_usage, memory_usage, disk_usage, server_ip, create_time)
+        values (#{cpuUsage}, #{memoryUsage}, #{diskUsage}, #{serverIp}, #{createTime})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into tbl_status(cpu_usage, memory_usage, disk_usage, server_ip, create_time)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+        (#{entity.cpuUsage}, #{entity.memoryUsage}, #{entity.diskUsage}, #{entity.serverIp}, #{entity.createTime})
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into tbl_status(cpu_usage, memory_usage, disk_usage, server_ip, create_time)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.cpuUsage}, #{entity.memoryUsage}, #{entity.diskUsage}, #{entity.serverIp}, #{entity.createTime})
+        </foreach>
+        on duplicate key update
+        cpu_usage = values(cpu_usage),
+        memory_usage = values(memory_usage),
+        disk_usage = values(disk_usage),
+        server_ip = values(server_ip),
+        create_time = values(create_time)
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update tbl_status
+        <set>
+            <if test="cpuUsage != null">
+                cpu_usage = #{cpuUsage},
+            </if>
+            <if test="memoryUsage != null">
+                memory_usage = #{memoryUsage},
+            </if>
+            <if test="diskUsage != null">
+                disk_usage = #{diskUsage},
+            </if>
+            <if test="serverIp != null and serverIp != ''">
+                server_ip = #{serverIp},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from tbl_status where id = #{id}
+    </delete>
+
+</mapper>
+
