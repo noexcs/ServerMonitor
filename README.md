@@ -4,5 +4,5 @@
 
 ## 架构总览
 
-![](image/Architecture.jpg )
+![image](https://github.com/noexcs/ServerMonitor/raw/master/image/Architecture.jpg)
 
